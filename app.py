@@ -35,8 +35,8 @@ def main() -> None:
     # Run the financial model
     results = calculate(inputs)
 
-    # Display the dashboard
-    dashboard.render(results)
+    # Display the dashboard (pass inputs for Monte Carlo tab)
+    dashboard.render(results, base_inputs=inputs)
 
 
 if __name__ == "__main__":
