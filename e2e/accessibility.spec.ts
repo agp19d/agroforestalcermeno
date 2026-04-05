@@ -3,6 +3,8 @@ import AxeBuilder from '@axe-core/playwright';
 
 test.describe('Accessibility', () => {
   test('main page has no critical a11y violations', async ({ page }) => {
+    // Use desktop viewport so sidebar is visible (not hidden in Sheet)
+    await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -18,6 +20,8 @@ test.describe('Accessibility', () => {
   });
 
   test('each tab panel has no critical a11y violations', async ({ page }) => {
+    // Use desktop viewport so sidebar is visible (not hidden in Sheet)
+    await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
