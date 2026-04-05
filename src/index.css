@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --espresso: #1a2744;
+  --dark-roast: #263B6A;
+  --medium-roast: #3d5a8a;
+  --parchment: #EEFABD;
+  --gold: #A0D585;
+  --cherry-red: #b83030;
+
+  --background: var(--espresso);
+  --foreground: var(--parchment);
+  --card: var(--dark-roast);
+  --card-foreground: var(--parchment);
+  --popover: var(--dark-roast);
+  --popover-foreground: var(--parchment);
+  --primary: var(--gold);
+  --primary-foreground: var(--espresso);
+  --secondary: var(--medium-roast);
+  --secondary-foreground: var(--parchment);
+  --muted: #2e4570;
+  --muted-foreground: rgba(238, 250, 189, 0.5);
+  --accent: var(--medium-roast);
+  --accent-foreground: var(--gold);
+  --destructive: #d62828;
+  --destructive-foreground: var(--parchment);
+  --border: rgba(160, 213, 133, 0.15);
+  --input: rgba(160, 213, 133, 0.15);
+  --ring: rgba(160, 213, 133, 0.3);
+  --radius: 0.75rem;
+
+  --colour-positive: #A0D585;
+  --colour-negative: #d62828;
+  --colour-total: #6984A9;
+}
+
+* {
+  border-color: var(--border);
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(170deg, #0f1a30 0%, var(--espresso) 40%, var(--dark-roast) 100%);
+  color: var(--foreground);
+  font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(160, 213, 133, 0.2); border-radius: 3px; }
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: var(--dark-roast) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  color: var(--parchment) !important;
+}
