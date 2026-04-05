@@ -1,48 +1,49 @@
-"""Application-wide constants and default input values.
+"""Constantes y valores predeterminados de la aplicación.
 
-This module centralises every tunable default so that the rest of the
-codebase can import them from a single place.  All monetary values are
-in US dollars and all weights are in pounds (lbs).
+Este módulo centraliza todos los valores por defecto configurables
+para que el resto del código los importe desde un solo lugar.
+Todos los valores monetarios están en Balboas panameños (B/.) y
+todos los pesos en libras (lbs).
 """
 
 from __future__ import annotations
 
 from typing import Any
 
-# ── Persistence ──────────────────────────────────────────────────────────────
+# ── Persistencia ─────────────────────────────────────────────────────────────
 
 SCENARIOS_FILENAME: str = "scenarios.json"
-"""Name of the JSON file where saved scenarios are stored."""
+"""Nombre del archivo JSON donde se guardan los escenarios."""
 
-# ── Default Input Values ─────────────────────────────────────────────────────
-# Each key mirrors the Streamlit widget key (without the ``in_`` prefix).
+# ── Valores de Entrada Predeterminados ───────────────────────────────────────
+# Cada clave corresponde al widget de Streamlit (sin el prefijo ``in_``).
 
 DEFAULT_INPUTS: dict[str, Any] = {
-    # Plantation & land
+    # Finca y terreno
     "total_hectares": 5.0,
     "plants_per_ha": 5000,
     "productive_hectares": 4.0,
     "land_cost": 2000.0,
 
-    # Yield estimates
+    # Estimaciones de rendimiento
     "cherry_yield_per_ha": 8000.0,
-    "cherry_to_green": 20.0,       # percent
-    "green_to_roasted": 82.0,      # percent
+    "cherry_to_green": 20.0,       # porcentaje
+    "green_to_roasted": 82.0,      # porcentaje
 
-    # Production allocation (must sum to 100)
+    # Asignación de producción (debe sumar 100)
     "pct_green": 40.0,
     "pct_processed": 30.0,
     "pct_roasted": 30.0,
 
-    # Labour
+    # Mano de obra
     "permanent_workers": 3,
     "monthly_wage": 400.0,
     "seasonal_workers": 10,
     "seasonal_daily_wage": 15.0,
     "harvest_days": 60,
-    "labor_benefits": 30.0,        # percent
+    "labor_benefits": 30.0,        # porcentaje
 
-    # Inputs & materials (annual)
+    # Insumos y materiales (anual)
     "fertilizer": 3000.0,
     "pesticide": 1500.0,
     "seedlings": 500.0,
@@ -50,12 +51,12 @@ DEFAULT_INPUTS: dict[str, Any] = {
     "tools": 800.0,
     "fuel": 1000.0,
 
-    # Processing & roasting (per-lb)
+    # Procesamiento y tueste (por libra)
     "processing_cost_lb": 0.50,
     "roasting_cost_lb": 1.50,
     "packaging_cost_lb": 0.75,
 
-    # Overhead & fixed (annual)
+    # Gastos generales y fijos (anual)
     "transport": 2000.0,
     "certification": 1500.0,
     "admin": 1200.0,
@@ -64,19 +65,19 @@ DEFAULT_INPUTS: dict[str, Any] = {
     "marketing": 500.0,
     "loan_interest": 0.0,
     "depreciation": 1000.0,
-    "tax_rate": 15.0,              # percent
-    "contingency": 5.0,            # percent
+    "tax_rate": 15.0,              # porcentaje
+    "contingency": 5.0,            # porcentaje
 
-    # Sales prices (per-lb)
+    # Precios de venta (por libra)
     "price_green": 2.50,
     "price_processed": 4.00,
     "price_roasted": 8.00,
 }
 
-# ── Chart Colour Palette ─────────────────────────────────────────────────────
+# ── Paleta de Colores para Gráficos ─────────────────────────────────────────
 
 COLOURS_GREEN: list[str] = ["#2d6a4f", "#40916c", "#74c69d"]
-"""Three-shade green palette used for bean-type charts."""
+"""Paleta de tres tonos verdes para gráficos por tipo de grano."""
 
 COLOUR_POSITIVE: str = "#2d6a4f"
 COLOUR_NEGATIVE: str = "#d62828"

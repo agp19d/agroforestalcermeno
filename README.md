@@ -1,87 +1,87 @@
-# Agroforestal Cermeño — Coffee Production Financial Planner
+# Agroforestal Cermeño — Planificador Financiero de Producción de Café
 
-A Streamlit web application for coffee plantation owners to model production costs, output volumes, revenue, and profitability under different financial scenarios — including Monte Carlo risk analysis.
+Aplicación web Streamlit para productores de café que permite modelar costos de producción, volúmenes de producción, ingresos y rentabilidad bajo diferentes escenarios financieros — incluyendo análisis de riesgo con simulación Monte Carlo. Todos los valores monetarios están en **Balboas panameños (B/.)**.
 
-## Features
+## Características
 
-- **Production Modeling** — estimate cherry harvest, green coffee yield, and final output in lbs for three product types: raw (green), processed (washed/natural/honey), and roasted.
-- **Full Cost Tracking** — labour (permanent and seasonal), inputs and materials, processing, roasting, packaging, land, overhead, taxes, and contingency.
-- **Revenue Projections** — per-lb pricing for each bean type with automatic revenue calculation.
-- **Profitability Analysis** — gross/net profit, margins, cost per lb, break-even price, revenue and profit per hectare, and a waterfall chart from revenue to net profit.
-- **Scenario Management** — save, load, delete, and compare multiple named scenarios side by side with tables and grouped bar charts.
-- **Monte Carlo Simulation** — model uncertainty by sampling key inputs from triangular distributions across thousands of iterations. Outputs include:
-  - Probability of loss indicator
-  - Histograms with mean, P5, and P95 lines
-  - Cumulative distribution function (CDF) chart
-  - Summary statistics table (mean, std dev, percentiles)
+- **Modelado de Producción** — estima la cosecha de cereza, rendimiento de café verde y producción final en libras para tres tipos de producto: crudo (verde), procesado (lavado/natural/honey) y tostado.
+- **Control Completo de Costos** — mano de obra (permanente y temporal), insumos y materiales, procesamiento, tueste, empaque, terreno, gastos generales, impuestos y contingencia.
+- **Proyecciones de Ingresos** — precio por libra para cada tipo de grano con cálculo automático de ingresos.
+- **Análisis de Rentabilidad** — ganancia bruta/neta, márgenes, costo por libra, punto de equilibrio, ingresos y ganancia por hectárea, y gráfico de cascada de ingresos a ganancia neta.
+- **Gestión de Escenarios** — guardar, cargar, eliminar y comparar múltiples escenarios lado a lado con tablas y gráficos de barras.
+- **Simulación Monte Carlo** — modela la incertidumbre muestreando entradas clave desde distribuciones triangulares a través de miles de iteraciones. Resultados incluyen:
+  - Indicador de probabilidad de pérdida
+  - Histogramas con líneas de media, P5 y P95
+  - Gráfico de función de distribución acumulada (CDF)
+  - Tabla de estadísticas resumidas (media, desviación estándar, percentiles)
 
-## Project Structure
+## Estructura del Proyecto
 
 ```
-├── app.py              # Entry point — wires sidebar, engine, and dashboard
-├── config.py           # Constants, default input values, colour palette
-├── models.py           # FinancialResults dataclass and calculation engine
-├── simulation.py       # Monte Carlo simulation engine
-├── scenarios.py        # JSON-based scenario persistence
-├── formatting.py       # Currency, percent, and number formatting helpers
+├── app.py              # Punto de entrada — conecta panel lateral, motor y tablero
+├── config.py           # Constantes, valores predeterminados, paleta de colores
+├── models.py           # Dataclass FinancialResults y motor de cálculo
+├── simulation.py       # Motor de simulación Monte Carlo
+├── scenarios.py        # Persistencia de escenarios en JSON
+├── formatting.py       # Utilidades de formato de moneda, porcentaje y números
 ├── ui/
 │   ├── __init__.py
-│   ├── sidebar.py      # All sidebar input widgets
-│   ├── dashboard.py    # Main-area KPIs, tables, and Plotly charts
-│   └── montecarlo.py   # Monte Carlo configuration and result charts
+│   ├── sidebar.py      # Widgets de entrada del panel lateral
+│   ├── dashboard.py    # KPIs del área principal, tablas y gráficos Plotly
+│   └── montecarlo.py   # Configuración y gráficos de Monte Carlo
 ├── requirements.txt
 └── README.md
 ```
 
-## Requirements
+## Requisitos
 
 - Python 3.10+
-- Dependencies listed in `requirements.txt`
+- Dependencias listadas en `requirements.txt`
 
-## Getting Started
+## Primeros Pasos
 
-1. **Clone the repository**
+1. **Clonar el repositorio**
 
    ```bash
    git clone https://github.com/agp19d/agroforestalcermeno.git
    cd agroforestalcermeno
    ```
 
-2. **Install dependencies**
+2. **Instalar dependencias**
 
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Run the application**
+3. **Ejecutar la aplicación**
 
    ```bash
    streamlit run app.py
    ```
 
-   The app will open in your browser at `http://localhost:8501`.
+   La aplicación se abrirá en su navegador en `http://localhost:8501`.
 
-## Usage
+## Uso
 
-1. Adjust inputs in the **sidebar** — plantation size, yield estimates, production allocation, labour, materials, processing costs, overhead, and sales prices.
-2. View real-time results in the **main area** across six tabs: Production, Revenue, Costs, Profitability, Compare Scenarios, and Monte Carlo.
-3. Save scenarios with a name, then load or compare them later.
-4. In the **Monte Carlo** tab, configure uncertainty ranges for key variables, run the simulation, and review the probability distributions and risk indicators.
+1. Ajuste las entradas en el **panel lateral** — tamaño de finca, estimaciones de rendimiento, asignación de producción, mano de obra, materiales, costos de procesamiento, gastos generales y precios de venta.
+2. Vea los resultados en tiempo real en el **área principal** a través de seis pestañas: Producción, Ingresos, Costos, Rentabilidad, Comparar Escenarios y Monte Carlo.
+3. Guarde escenarios con un nombre, luego cárguelos o compárelos después.
+4. En la pestaña **Monte Carlo**, configure rangos de incertidumbre para variables clave, ejecute la simulación y revise las distribuciones de probabilidad e indicadores de riesgo.
 
-## Input Categories
+## Categorías de Entrada
 
-| Category | Examples |
+| Categoría | Ejemplos |
 |---|---|
-| Plantation & Land | total hectares, productive hectares, land cost |
-| Yield | cherry yield per hectare, cherry-to-green ratio, green-to-roasted ratio |
-| Production Allocation | % sold as green, processed, or roasted |
-| Labour | permanent workers, seasonal workers, wages, benefits |
-| Inputs & Materials | fertilizer, pesticides, seedlings, water, tools, fuel |
-| Processing & Roasting | processing cost/lb, roasting cost/lb, packaging cost/lb |
-| Overhead & Fixed | transport, certifications, admin, insurance, maintenance, marketing, loans, depreciation |
-| Financial | tax rate, contingency buffer |
-| Sales Prices | price per lb for green, processed, and roasted coffee |
+| Finca y Terreno | hectáreas totales, hectáreas productivas, costo de terreno |
+| Rendimiento | rendimiento de cereza por hectárea, ratio cereza-verde, ratio verde-tostado |
+| Asignación de Producción | % vendido como verde, procesado o tostado |
+| Mano de Obra | trabajadores permanentes, temporales, salarios, prestaciones |
+| Insumos y Materiales | fertilizante, pesticidas, plántulas, agua, herramientas, combustible |
+| Procesamiento y Tueste | costo de procesamiento/lb, costo de tueste/lb, costo de empaque/lb |
+| Gastos Generales y Fijos | transporte, certificaciones, administración, seguros, mantenimiento, mercadeo, préstamos, depreciación |
+| Financiero | tasa de impuestos, reserva de contingencia |
+| Precios de Venta | precio por libra para café verde, procesado y tostado |
 
-## License
+## Licencia
 
-This project is provided as-is for private use by Agroforestal Cermeño.
+Este proyecto es proporcionado tal cual para uso privado de Agroforestal Cermeño.

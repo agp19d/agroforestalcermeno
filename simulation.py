@@ -1,9 +1,10 @@
-"""Monte Carlo simulation engine for coffee production scenarios.
+"""Motor de simulación Monte Carlo para escenarios de producción de café.
 
-Runs *N* iterations of the financial model, sampling each uncertain
-input from a user-defined probability distribution (triangular by
-default).  Returns a :class:`SimulationResults` object that holds
-per-metric arrays and pre-computed summary statistics.
+Ejecuta *N* iteraciones del modelo financiero, muestreando cada
+entrada incierta de una distribución de probabilidad definida por el
+usuario (triangular por defecto).  Devuelve un objeto
+:class:`SimulationResults` con arreglos por métrica y estadísticas
+resumidas precalculadas.
 """
 
 from __future__ import annotations
@@ -17,23 +18,23 @@ import pandas as pd
 from models import FinancialResults, calculate
 
 
-# ── Configuration ────────────────────────────────────────────────────────────
+# ── Configuración ────────────────────────────────────────────────────────────
 
 @dataclass
 class VariableRange:
-    """Defines the uncertainty range for a single input variable.
+    """Define el rango de incertidumbre para una variable de entrada.
 
-    The triangular distribution is parameterised by *low*, *base*
-    (mode), and *high*.  If the variable is not marked *enabled*, it
-    will be held constant at its *base* value during simulation.
+    La distribución triangular se parametriza con *low*, *base*
+    (moda) y *high*.  Si la variable no está marcada como *enabled*,
+    se mantendrá constante en su valor *base* durante la simulación.
 
     Attributes:
-        key: The input key name (without the ``in_`` prefix).
-        label: Human-readable label for the UI.
-        low: Optimistic / minimum bound.
-        base: Most-likely value (mode of the triangle).
-        high: Pessimistic / maximum bound.
-        enabled: Whether this variable should be sampled.
+        key: Nombre de la clave de entrada (sin el prefijo ``in_``).
+        label: Etiqueta legible para la interfaz de usuario.
+        low: Límite optimista / mínimo.
+        base: Valor más probable (moda del triángulo).
+        high: Límite pesimista / máximo.
+        enabled: Si esta variable debe ser muestreada.
     """
 
     key: str
@@ -44,22 +45,22 @@ class VariableRange:
     enabled: bool = True
 
 
-# The subset of inputs most commonly subject to uncertainty.
+# Subconjunto de entradas más comúnmente sujetas a incertidumbre.
 DEFAULT_VARIABLE_KEYS: list[dict[str, str]] = [
-    {"key": "cherry_yield_per_ha", "label": "Cherry Yield (lbs/ha)"},
-    {"key": "cherry_to_green", "label": "Cherry to Green Ratio (%)"},
-    {"key": "price_green", "label": "Green Coffee Price ($/lb)"},
-    {"key": "price_processed", "label": "Processed Coffee Price ($/lb)"},
-    {"key": "price_roasted", "label": "Roasted Coffee Price ($/lb)"},
-    {"key": "fertilizer", "label": "Fertilizer Cost ($)"},
-    {"key": "pesticide", "label": "Pest & Disease Control ($)"},
-    {"key": "seasonal_workers", "label": "Seasonal Workers"},
-    {"key": "seasonal_daily_wage", "label": "Seasonal Daily Wage ($)"},
-    {"key": "harvest_days", "label": "Harvest Days"},
-    {"key": "processing_cost_lb", "label": "Processing Cost ($/lb)"},
-    {"key": "roasting_cost_lb", "label": "Roasting Cost ($/lb)"},
-    {"key": "fuel", "label": "Fuel & Energy ($)"},
-    {"key": "transport", "label": "Transport & Logistics ($)"},
+    {"key": "cherry_yield_per_ha", "label": "Rendimiento de Cereza (lbs/ha)"},
+    {"key": "cherry_to_green", "label": "Ratio Cereza a Verde (%)"},
+    {"key": "price_green", "label": "Precio Café Verde (B/./lb)"},
+    {"key": "price_processed", "label": "Precio Café Procesado (B/./lb)"},
+    {"key": "price_roasted", "label": "Precio Café Tostado (B/./lb)"},
+    {"key": "fertilizer", "label": "Costo de Fertilizante (B/.)"},
+    {"key": "pesticide", "label": "Control de Plagas (B/.)"},
+    {"key": "seasonal_workers", "label": "Trabajadores Temporales"},
+    {"key": "seasonal_daily_wage", "label": "Jornal Diario Temporal (B/.)"},
+    {"key": "harvest_days", "label": "Días de Cosecha"},
+    {"key": "processing_cost_lb", "label": "Costo de Procesamiento (B/./lb)"},
+    {"key": "roasting_cost_lb", "label": "Costo de Tueste (B/./lb)"},
+    {"key": "fuel", "label": "Combustible y Energía (B/.)"},
+    {"key": "transport", "label": "Transporte y Logística (B/.)"},
 ]
 
 
@@ -67,19 +68,19 @@ def build_default_ranges(
     base_inputs: dict[str, Any],
     spread: float = 0.20,
 ) -> list[VariableRange]:
-    """Create default :class:`VariableRange` objects from current inputs.
+    """Crea objetos :class:`VariableRange` predeterminados desde las entradas actuales.
 
-    Each variable gets a symmetric spread of +/- *spread* (default 20 %)
-    around its base value.
+    Cada variable obtiene un rango simétrico de +/- *spread* (por defecto
+    20 %) alrededor de su valor base.
 
     Args:
-        base_inputs: Current scenario input dictionary (keys may have
-            the ``in_`` prefix).
-        spread: Fractional spread applied symmetrically (0.20 = 20 %).
+        base_inputs: Diccionario de entradas del escenario actual (las
+            claves pueden tener el prefijo ``in_``).
+        spread: Dispersión fraccional aplicada simétricamente (0.20 = 20 %).
 
     Returns:
-        A list of :class:`VariableRange` instances for every key in
-        :data:`DEFAULT_VARIABLE_KEYS`.
+        Una lista de instancias :class:`VariableRange` para cada clave
+        en :data:`DEFAULT_VARIABLE_KEYS`.
     """
     ranges: list[VariableRange] = []
     for spec in DEFAULT_VARIABLE_KEYS:
@@ -100,9 +101,9 @@ def build_default_ranges(
     return ranges
 
 
-# ── Simulation Results ───────────────────────────────────────────────────────
+# ── Resultados de Simulación ─────────────────────────────────────────────────
 
-# Metrics we track across iterations.
+# Métricas que rastreamos a través de las iteraciones.
 TRACKED_METRICS: list[str] = [
     "total_revenue",
     "total_costs",
@@ -117,29 +118,29 @@ TRACKED_METRICS: list[str] = [
 ]
 
 METRIC_LABELS: dict[str, str] = {
-    "total_revenue": "Total Revenue ($)",
-    "total_costs": "Total Costs ($)",
-    "net_profit": "Net Profit ($)",
-    "margin": "Profit Margin (%)",
-    "cost_per_lb_green": "Cost per lb Green ($)",
-    "breakeven": "Break-even Price ($/lb)",
-    "total_green": "Total Green Coffee (lbs)",
-    "roasted_output_lbs": "Roasted Output (lbs)",
-    "rev_per_ha": "Revenue per Hectare ($)",
-    "profit_per_ha": "Profit per Hectare ($)",
+    "total_revenue": "Ingresos Totales (B/.)",
+    "total_costs": "Costos Totales (B/.)",
+    "net_profit": "Ganancia Neta (B/.)",
+    "margin": "Margen de Ganancia (%)",
+    "cost_per_lb_green": "Costo por lb Verde (B/.)",
+    "breakeven": "Punto de Equilibrio (B/./lb)",
+    "total_green": "Total Café Verde (lbs)",
+    "roasted_output_lbs": "Producción Tostado (lbs)",
+    "rev_per_ha": "Ingresos por Hectárea (B/.)",
+    "profit_per_ha": "Ganancia por Hectárea (B/.)",
 }
 
 
 @dataclass
 class SimulationResults:
-    """Container for Monte Carlo simulation output.
+    """Contenedor para los resultados de simulación Monte Carlo.
 
     Attributes:
-        n_iterations: Number of iterations that were run.
-        metric_arrays: Mapping of metric name → 1-D NumPy array of
-            length *n_iterations*.
-        summary_df: Pre-computed DataFrame with mean, std, and
-            percentile columns for every tracked metric.
+        n_iterations: Número de iteraciones ejecutadas.
+        metric_arrays: Mapeo de nombre de métrica → arreglo NumPy 1-D
+            de longitud *n_iterations*.
+        summary_df: DataFrame precalculado con columnas de media,
+            desviación estándar y percentiles para cada métrica.
     """
 
     n_iterations: int
@@ -147,7 +148,7 @@ class SimulationResults:
     summary_df: pd.DataFrame
 
 
-# ── Engine ───────────────────────────────────────────────────────────────────
+# ── Motor ────────────────────────────────────────────────────────────────────
 
 def run_simulation(
     base_inputs: dict[str, Any],
@@ -155,45 +156,46 @@ def run_simulation(
     n_iterations: int = 5000,
     seed: int | None = None,
 ) -> SimulationResults:
-    """Execute the Monte Carlo simulation.
+    """Ejecuta la simulación Monte Carlo.
 
-    For each iteration, every *enabled* :class:`VariableRange` is
-    sampled from a triangular distribution.  The sampled values replace
-    the corresponding base inputs, and the full financial model is
-    evaluated via :func:`models.calculate`.
+    Para cada iteración, cada :class:`VariableRange` *habilitada* es
+    muestreada de una distribución triangular.  Los valores muestreados
+    reemplazan las entradas base correspondientes, y el modelo financiero
+    completo se evalúa vía :func:`models.calculate`.
 
     Args:
-        base_inputs: The deterministic scenario inputs (used as the
-            starting point for each iteration).
-        variable_ranges: List of uncertain variables with their
-            distribution parameters.
-        n_iterations: How many iterations to run (default 5 000).
-        seed: Optional RNG seed for reproducibility.
+        base_inputs: Las entradas determinísticas del escenario (usadas
+            como punto de partida para cada iteración).
+        variable_ranges: Lista de variables inciertas con sus
+            parámetros de distribución.
+        n_iterations: Cuántas iteraciones ejecutar (por defecto 5 000).
+        seed: Semilla opcional del generador aleatorio para
+            reproducibilidad.
 
     Returns:
-        A :class:`SimulationResults` instance.
+        Una instancia de :class:`SimulationResults`.
     """
     rng = np.random.default_rng(seed)
 
-    # Pre-allocate result arrays.
+    # Pre-asignar arreglos de resultados.
     arrays: dict[str, np.ndarray] = {
         m: np.empty(n_iterations, dtype=np.float64) for m in TRACKED_METRICS
     }
 
-    # Filter to only enabled ranges.
+    # Filtrar solo rangos habilitados.
     active_ranges = [vr for vr in variable_ranges if vr.enabled]
 
     for i in range(n_iterations):
-        # Start from a copy of the base inputs.
+        # Partir de una copia de las entradas base.
         sampled = dict(base_inputs)
 
-        # Sample each uncertain variable.
+        # Muestrear cada variable incierta.
         for vr in active_ranges:
-            # Ensure low <= mode <= high for the triangular distribution.
+            # Asegurar low <= mode <= high para la distribución triangular.
             low = min(vr.low, vr.base)
             high = max(vr.high, vr.base)
             mode = vr.base
-            # Clamp mode within [low, high] to satisfy numpy.
+            # Limitar mode dentro de [low, high] para satisfacer numpy.
             mode = max(low, min(mode, high))
             if low == high:
                 value = low
@@ -201,27 +203,27 @@ def run_simulation(
                 value = rng.triangular(low, mode, high)
             sampled[f"in_{vr.key}"] = value
 
-        # Run the financial model.
+        # Ejecutar el modelo financiero.
         result: FinancialResults = calculate(sampled)
 
-        # Store tracked metrics.
+        # Almacenar métricas rastreadas.
         result_dict = result.as_dict()
         for metric in TRACKED_METRICS:
             arrays[metric][i] = result_dict[metric]
 
-    # Build summary statistics.
+    # Construir estadísticas resumidas.
     summary_rows: list[dict[str, Any]] = []
     for metric in TRACKED_METRICS:
         arr = arrays[metric]
         summary_rows.append({
-            "Metric": METRIC_LABELS.get(metric, metric),
-            "Mean": np.mean(arr),
-            "Std Dev": np.std(arr),
-            "5th Pctl": np.percentile(arr, 5),
-            "25th Pctl": np.percentile(arr, 25),
-            "Median": np.percentile(arr, 50),
-            "75th Pctl": np.percentile(arr, 75),
-            "95th Pctl": np.percentile(arr, 95),
+            "Métrica": METRIC_LABELS.get(metric, metric),
+            "Media": np.mean(arr),
+            "Desv. Est.": np.std(arr),
+            "Percentil 5": np.percentile(arr, 5),
+            "Percentil 25": np.percentile(arr, 25),
+            "Mediana": np.percentile(arr, 50),
+            "Percentil 75": np.percentile(arr, 75),
+            "Percentil 95": np.percentile(arr, 95),
             "P(< 0)": np.mean(arr < 0) * 100,
         })
 
