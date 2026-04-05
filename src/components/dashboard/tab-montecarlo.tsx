@@ -12,7 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { useInputs } from '@/hooks/use-inputs';
 import { useSimulation } from '@/hooks/use-simulation';
 import { buildDefaultRanges, type VariableRange } from '@/lib/simulation';
-import { TRACKED_METRICS, METRIC_LABELS } from '@/lib/config';
+import { TRACKED_METRICS, METRIC_LABELS, TOOLTIP_STYLE } from '@/lib/config';
 import { fmtCurrency, fmtPercent } from '@/lib/formatting';
 
 function formatMetricValue(metric: string, value: number): string {
@@ -104,8 +104,9 @@ export function TabMonteCarlo() {
       {/* Configuration */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="space-y-1">
-          <Label>Número de iteraciones</Label>
+          <Label htmlFor="mc-iterations">Número de iteraciones</Label>
           <Input
+            id="mc-iterations"
             type="number"
             value={nIterations}
             min={100}
@@ -119,8 +120,9 @@ export function TabMonteCarlo() {
           />
         </div>
         <div className="space-y-1">
-          <Label>Dispersión por defecto (%)</Label>
+          <Label htmlFor="mc-spread">Dispersión por defecto (%)</Label>
           <Input
+            id="mc-spread"
             type="number"
             value={spread}
             min={1}
@@ -161,8 +163,9 @@ export function TabMonteCarlo() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label>Bajo (optimista)</Label>
+                    <Label htmlFor={`mc-low-${vr.key}`}>Bajo (optimista)</Label>
                     <Input
+                      id={`mc-low-${vr.key}`}
                       type="number"
                       value={vr.low}
                       step={Math.abs(vr.base * 0.05) || 0.01}
@@ -175,8 +178,9 @@ export function TabMonteCarlo() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label>Alto (pesimista)</Label>
+                    <Label htmlFor={`mc-high-${vr.key}`}>Alto (pesimista)</Label>
                     <Input
+                      id={`mc-high-${vr.key}`}
                       type="number"
                       value={vr.high}
                       step={Math.abs(vr.base * 0.05) || 0.01}
@@ -259,7 +263,7 @@ export function TabMonteCarlo() {
                   <XAxis dataKey="x" stroke="var(--muted-foreground)" fontSize={10} tickFormatter={(v) => formatMetricValue(selectedMetric, v)} />
                   <YAxis stroke="var(--muted-foreground)" fontSize={10} />
                   <Tooltip
-                    contentStyle={{ background: 'var(--dark-roast)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--parchment)' }}
+                    contentStyle={TOOLTIP_STYLE}
                     formatter={(value) => [Number(value), 'Frecuencia']}
                     labelFormatter={(v) => formatMetricValue(selectedMetric, v as number)}
                   />
@@ -275,7 +279,7 @@ export function TabMonteCarlo() {
                   <XAxis dataKey="x" stroke="var(--muted-foreground)" fontSize={10} tickFormatter={(v) => fmtCurrency(v)} />
                   <YAxis stroke="var(--muted-foreground)" fontSize={10} unit="%" />
                   <Tooltip
-                    contentStyle={{ background: 'var(--dark-roast)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--parchment)' }}
+                    contentStyle={TOOLTIP_STYLE}
                     formatter={(value) => [`${Number(value).toFixed(1)}%`, 'Probabilidad']}
                     labelFormatter={(v) => fmtCurrency(v as number)}
                   />

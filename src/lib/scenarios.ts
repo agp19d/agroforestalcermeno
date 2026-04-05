@@ -1,36 +1,8 @@
-import { DEFAULT_INPUTS, type InputValues } from './config';
+import { sanitizeInputs, type InputValues } from './config';
 
 const STORAGE_KEY = 'agroforestal-scenarios';
 
 type ScenarioMap = Record<string, InputValues>;
-
-// Security: allowlist of valid InputValues keys to prevent prototype pollution
-// and extraneous property injection from untrusted localStorage data.
-const VALID_KEYS = new Set<string>(Object.keys(DEFAULT_INPUTS));
-
-/**
- * Sanitize and validate data loaded from localStorage.
- * Strips unknown keys (including __proto__, constructor, etc.),
- * ensures all values are finite numbers, and fills missing keys
- * with defaults.
- */
-function sanitizeInputs(raw: unknown): InputValues | null {
-  if (raw == null || typeof raw !== 'object' || Array.isArray(raw)) {
-    return null;
-  }
-  const result = { ...DEFAULT_INPUTS };
-  const obj = raw as Record<string, unknown>;
-  for (const key of VALID_KEYS) {
-    if (key in obj) {
-      const val = obj[key];
-      if (typeof val === 'number' && Number.isFinite(val)) {
-        (result as Record<string, number>)[key] = val;
-      }
-      // Non-numeric or non-finite values fall back to the default
-    }
-  }
-  return result;
-}
 
 export function loadAll(): ScenarioMap {
   try {

@@ -3,6 +3,7 @@ import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const Accordion = AccordionPrimitive.Root;
 
 export const AccordionItem = React.forwardRef<

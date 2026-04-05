@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { fmtCurrency, fmtPercent, fmtNumber } from '@/lib/formatting';
+import { TOOLTIP_STYLE } from '@/lib/config';
 import { calculate } from '@/lib/models';
 import { useScenarios } from '@/hooks/use-scenarios';
 
@@ -93,7 +94,7 @@ export function TabCompare() {
               <XAxis dataKey="metric" stroke="var(--muted-foreground)" fontSize={12} />
               <YAxis stroke="var(--muted-foreground)" fontSize={11} tickFormatter={(v) => `B/.${(v / 1000).toFixed(0)}k`} />
               <Tooltip
-                contentStyle={{ background: 'var(--dark-roast)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--parchment)' }}
+                contentStyle={TOOLTIP_STYLE}
                 formatter={(value) => fmtCurrency(Number(value))}
               />
               <Legend />

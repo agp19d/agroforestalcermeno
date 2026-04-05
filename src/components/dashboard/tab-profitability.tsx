@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
 import { fmtCurrency, fmtPercent } from '@/lib/formatting';
-import { COLOUR_POSITIVE, COLOUR_NEGATIVE, COLOUR_TOTAL } from '@/lib/config';
+import { COLOUR_POSITIVE, COLOUR_NEGATIVE, COLOUR_TOTAL, TOOLTIP_STYLE } from '@/lib/config';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import type { FinancialResults } from '@/lib/models';
 
@@ -75,7 +75,8 @@ export function TabProfitability({ results: r }: Props) {
           <XAxis dataKey="name" stroke="var(--muted-foreground)" fontSize={10} interval={0} angle={-30} textAnchor="end" height={80} />
           <YAxis stroke="var(--muted-foreground)" fontSize={11} tickFormatter={(v) => `B/.${(v / 1000).toFixed(0)}k`} />
           <Tooltip
-            contentStyle={{ background: 'var(--dark-roast)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--parchment)' }}
+            contentStyle={TOOLTIP_STYLE}
+            // Recharts does not expose payload.total in its formatter type — cast required
             formatter={(_value, _name, props) => fmtCurrency((props as unknown as { payload: { total: number } }).payload.total)}
             labelFormatter={(label) => label}
           />

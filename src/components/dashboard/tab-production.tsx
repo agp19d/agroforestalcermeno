@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { fmtNumber } from '@/lib/formatting';
-import { COLOURS_PRODUCT } from '@/lib/config';
+import { COLOURS_PRODUCT, TOOLTIP_STYLE } from '@/lib/config';
 import type { FinancialResults } from '@/lib/models';
 
 interface Props { results: FinancialResults }
@@ -56,7 +56,7 @@ export function TabProduction({ results: r }: Props) {
               <XAxis dataKey="name" stroke="var(--muted-foreground)" fontSize={12} />
               <YAxis stroke="var(--muted-foreground)" fontSize={12} tickFormatter={(v) => fmtNumber(v)} />
               <Tooltip
-                contentStyle={{ background: 'var(--dark-roast)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--parchment)' }}
+                contentStyle={TOOLTIP_STYLE}
                 formatter={(value) => fmtNumber(Number(value))}
               />
               <Legend />

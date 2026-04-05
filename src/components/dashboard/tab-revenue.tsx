@@ -1,6 +1,6 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { fmtCurrency } from '@/lib/formatting';
-import { PRODUCTS, COLOURS_PRODUCT } from '@/lib/config';
+import { PRODUCTS, COLOURS_PRODUCT, TOOLTIP_STYLE } from '@/lib/config';
 import type { FinancialResults } from '@/lib/models';
 
 interface Props { results: FinancialResults }
@@ -54,7 +54,7 @@ export function TabRevenue({ results: r }: Props) {
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{ background: 'var(--dark-roast)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--parchment)' }}
+                contentStyle={TOOLTIP_STYLE}
                 formatter={(value) => fmtCurrency(Number(value))}
               />
             </PieChart>

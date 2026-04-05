@@ -88,6 +88,32 @@ export const DEFAULT_INPUTS: InputValues = {
   contingency: 5.0,
 };
 
+/** Allowlist of valid InputValues keys — used by sanitization to prevent prototype pollution. */
+export const VALID_INPUT_KEYS = new Set<string>(Object.keys(DEFAULT_INPUTS));
+
+/**
+ * Sanitize and validate data intended to be InputValues.
+ * Strips unknown keys (including __proto__, constructor, etc.),
+ * ensures all values are finite numbers, and fills missing keys
+ * with defaults.
+ */
+export function sanitizeInputs(raw: unknown): InputValues | null {
+  if (raw == null || typeof raw !== 'object' || Array.isArray(raw)) {
+    return null;
+  }
+  const result = { ...DEFAULT_INPUTS };
+  const obj = raw as Record<string, unknown>;
+  for (const key of VALID_INPUT_KEYS) {
+    if (key in obj) {
+      const val = obj[key];
+      if (typeof val === 'number' && Number.isFinite(val)) {
+        (result as Record<string, number>)[key] = val;
+      }
+    }
+  }
+  return result;
+}
+
 export interface Product {
   key: string;
   label: string;
@@ -112,6 +138,14 @@ export const COLOURS_PRODUCT: Record<string, string> = {
 export const COLOUR_POSITIVE = '#A0D585';
 export const COLOUR_NEGATIVE = '#d62828';
 export const COLOUR_TOTAL = '#6984A9';
+
+/** Shared Recharts tooltip style used across all dashboard charts. */
+export const TOOLTIP_STYLE = {
+  background: 'var(--dark-roast)',
+  border: '1px solid var(--border)',
+  borderRadius: '8px',
+  color: 'var(--parchment)',
+} as const;
 
 export const DEFAULT_VARIABLE_KEYS = [
   { key: 'cherry_yield_per_ha', label: 'Rendimiento de Cereza (lbs/ha)' },
