@@ -4,37 +4,55 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Streamlit web app for Agroforestal Cermeño — a coffee production financial planner for a Panamanian farm. All UI text is in Spanish (Panama). All monetary values are in **Balboas panameños (B/.)**, all weights in **pounds (lbs)**.
+React + TypeScript SPA for Agroforestal Cermeño — a coffee production financial planner for a Panamanian farm. All UI text is in Spanish (Panama). All monetary values are in **Balboas panameños (B/.)**, all weights in **pounds (lbs)**.
 
 ## Commands
 
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+npm install
 
-# Run the app
-streamlit run app.py
+# Run dev server
+npm run dev
+
+# Production build (must exit 0 with no TS errors)
+npm run build
+
+# Preview production build
+npm run preview
 ```
-
-There are no tests, linter, or build steps configured.
 
 ## Architecture
 
 The app follows a clear data-flow pipeline: **sidebar inputs → calculation engine → dashboard output**.
 
-- **`app.py`** — Entry point. Wires sidebar → `calculate()` → dashboard. No logic lives here.
-- **`config.py`** — Single source of truth for all default input values (`DEFAULT_INPUTS` dict), color palette constants, and the scenarios filename.
-- **`models.py`** — Pure financial calculation engine. `calculate(inputs) → FinancialResults` (frozen dataclass). No side effects. Input keys can optionally carry the `in_` prefix from Streamlit session state; the `_get()` helper resolves both forms.
-- **`simulation.py`** — Monte Carlo engine. `run_simulation()` samples uncertain variables from triangular distributions, runs `calculate()` N times, returns `SimulationResults` with NumPy arrays and a summary DataFrame.
-- **`scenarios.py`** — JSON file persistence for named scenarios (save/load/delete). Stores to `scenarios.json` next to the app (gitignored).
-- **`formatting.py`** — Pure formatting helpers: `fmt_currency()` (B/. prefix), `fmt_percent()`, `fmt_number()`.
-- **`ui/sidebar.py`** — Renders all Streamlit sidebar input widgets. Widget keys use `in_` prefix (e.g., `in_price_green`). Returns collected inputs dict.
-- **`ui/dashboard.py`** — Main area with 6 tabs: Producción, Ingresos, Costos, Rentabilidad, Comparar Escenarios, Monte Carlo. Uses Plotly for all charts.
-- **`ui/montecarlo.py`** — Self-contained Monte Carlo tab: variable range configuration, simulation execution, and result visualization (histograms, CDF, risk metrics, summary table).
+### Business Logic (`src/lib/`)
+- **`config.ts`** — `InputValues` interface (42 fields), `DEFAULT_INPUTS`, `PRODUCTS`, colour constants, `TRACKED_METRICS`, `METRIC_LABELS`.
+- **`models.ts`** — `FinancialResults` interface + `calculate(inputs): FinancialResults`. Pure arithmetic, no side effects.
+- **`simulation.ts`** — Monte Carlo engine. `runSimulation()` samples from triangular distributions using inverse CDF. Returns `SimulationResults` with `metricArrays` and `summaryRows`.
+- **`simulation.worker.ts`** — Web Worker entry point. Receives inputs/ranges, calls `runSimulation()`, posts results back.
+- **`scenarios.ts`** — localStorage CRUD for named scenarios (`loadAll`, `saveOne`, `deleteOne`, `listNames`).
+- **`formatting.ts`** — `fmtCurrency()` (B/. prefix), `fmtPercent()`, `fmtNumber()`.
+- **`utils.ts`** — `cn()` helper (clsx + tailwind-merge).
+
+### Hooks (`src/hooks/`)
+- **`use-inputs.tsx`** — React context + `useReducer` for `InputValues`. Actions: `SET_FIELD`, `LOAD_SCENARIO`, `RESET_DEFAULTS`.
+- **`use-financial.ts`** — `useMemo(() => calculate(inputs), [inputs])`.
+- **`use-scenarios.ts`** — Wraps `scenarios.ts` with React state.
+- **`use-simulation.ts`** — Web Worker lifecycle (`run`, `isRunning`, `results`).
+
+### Components (`src/components/`)
+- **`layout/app-shell.tsx`** — Flexbox layout: 320px sidebar (desktop) or Sheet drawer (mobile).
+- **`sidebar/`** — 9 section components + `scenario-manager.tsx` + `sidebar-content.tsx` (accordion wrapper).
+- **`dashboard/dashboard.tsx`** — Pipeline, KPI bar, and 6 Tabs container.
+- **`dashboard/`** — `kpi-bar.tsx`, `pipeline.tsx`, `tab-production.tsx`, `tab-revenue.tsx`, `tab-costs.tsx`, `tab-profitability.tsx`, `tab-compare.tsx`, `tab-montecarlo.tsx`.
+- **`ui/`** — Radix-based primitives: Accordion, Button, Card, Checkbox, Input, Label, Sheet, Tabs.
 
 ## Key Conventions
 
-- Input dict keys use `in_` prefix in Streamlit session state (e.g., `in_cherry_yield_per_ha`), but `config.DEFAULT_INPUTS` uses bare keys. The `_get()` helper in `models.py` transparently handles both.
-- Production allocation percentages (`pct_green`, `pct_processed`, `pct_roasted`) must sum to 100%.
-- The `FinancialResults` dataclass is frozen/immutable — all fields are computed in `calculate()`.
-- Charts use the `COLOURS_GREEN` palette (`#2d6a4f`, `#40916c`, `#74c69d`) for bean-type breakdowns and `COLOUR_POSITIVE`/`COLOUR_NEGATIVE`/`COLOUR_TOTAL` for waterfall charts.
+- All inputs are typed via `InputValues` interface — direct property access, no `_get()` helper.
+- Production allocation percentages (`pct_cereza`, `pct_honey`, `pct_natural`, `pct_pilado`) must sum to 100%.
+- `FinancialResults` is a plain object (interface, not class) — all fields computed in `calculate()`.
+- Charts use `COLOURS_PRODUCT` for product breakdowns, `COLOUR_POSITIVE`/`COLOUR_NEGATIVE`/`COLOUR_TOTAL` for waterfall.
+- Tailwind CSS v4 with `@tailwindcss/vite` plugin. Theme via CSS custom properties in `src/index.css`.
+- Path alias: `@/` maps to `src/`.

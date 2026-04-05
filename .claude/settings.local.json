@@ -1,4 +1,20 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.py$|\\\\.txt$\")",
+      "Bash(wc:*)",
+      "Bash(npm create:*)",
+      "Bash(cd /tmp)",
+      "Bash(rm -rf vite-scaffold)",
+      "Bash(cp /tmp/vite-scaffold/index.html .)",
+      "Bash(cp /tmp/vite-scaffold/package.json .)",
+      "Bash(cp /tmp/vite-scaffold/tsconfig.json .)",
+      "Bash(cp /tmp/vite-scaffold/tsconfig.app.json .)",
+      "Bash(cp /tmp/vite-scaffold/tsconfig.node.json .)",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest init -y -d)"
+    ]
+  },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true
   }
