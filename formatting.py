@@ -1,46 +1,47 @@
-"""Display-formatting utilities used across the UI layer.
+"""Utilidades de formato para la capa de interfaz de usuario.
 
-All helpers are pure functions with no side-effects.
+Todas las funciones son puras, sin efectos secundarios.
+La moneda utilizada es el Balboa panameño (B/.).
 """
 
 from __future__ import annotations
 
 
 def fmt_currency(value: float, decimals: int = 2) -> str:
-    """Format *value* as US-dollar currency.
+    """Formatea *value* como moneda en Balboas panameños.
 
     Args:
-        value: The numeric amount.
-        decimals: Number of decimal places (default 2).
+        value: El monto numérico.
+        decimals: Cantidad de decimales (por defecto 2).
 
     Returns:
-        A string such as ``"$1,234.56"``.
+        Una cadena como ``"B/.1,234.56"``.
     """
-    return f"${value:,.{decimals}f}"
+    return f"B/.{value:,.{decimals}f}"
 
 
 def fmt_percent(value: float, decimals: int = 1) -> str:
-    """Format *value* as a percentage.
+    """Formatea *value* como porcentaje.
 
     Args:
-        value: The numeric amount (already multiplied by 100, e.g. 45.2
-            means 45.2 %).
-        decimals: Number of decimal places (default 1).
+        value: El monto numérico (ya multiplicado por 100, ej. 45.2
+            significa 45.2 %).
+        decimals: Cantidad de decimales (por defecto 1).
 
     Returns:
-        A string such as ``"45.2%"``.
+        Una cadena como ``"45.2%"``.
     """
     return f"{value:,.{decimals}f}%"
 
 
 def fmt_number(value: float, decimals: int = 0) -> str:
-    """Format *value* as a plain number with thousand separators.
+    """Formatea *value* como número con separadores de miles.
 
     Args:
-        value: The numeric amount.
-        decimals: Number of decimal places (default 0).
+        value: El monto numérico.
+        decimals: Cantidad de decimales (por defecto 0).
 
     Returns:
-        A string such as ``"6,400"``.
+        Una cadena como ``"6,400"``.
     """
     return f"{value:,.{decimals}f}"

@@ -1,11 +1,11 @@
-"""Monte Carlo simulation tab — configuration, execution, and results.
+"""Pestaña de simulación Monte Carlo — configuración, ejecución y resultados.
 
-Provides a self-contained Streamlit tab where the user can:
+Proporciona una pestaña autocontenida de Streamlit donde el usuario puede:
 
-1. Choose which input variables are uncertain and set their ranges.
-2. Run *N* iterations of the financial model.
-3. Inspect results via summary statistics, histograms, tornado charts,
-   and a probability-of-loss indicator.
+1. Elegir qué variables de entrada son inciertas y definir sus rangos.
+2. Ejecutar *N* iteraciones del modelo financiero.
+3. Inspeccionar resultados mediante estadísticas resumidas, histogramas,
+   gráficos de tornado e indicadores de probabilidad de pérdida.
 """
 
 from __future__ import annotations
@@ -28,91 +28,92 @@ from simulation import (
 )
 
 
-# ── Helpers ──────────────────────────────────────────────────────────────────
+# ── Ayudantes ────────────────────────────────────────────────────────────────
 
 def _format_metric_value(metric: str, value: float) -> str:
-    """Format a metric value with the appropriate prefix.
+    """Formatea el valor de una métrica con el prefijo apropiado.
 
     Args:
-        metric: Internal metric key (e.g. ``"net_profit"``).
-        value: The numeric value to format.
+        metric: Clave interna de métrica (ej. ``"net_profit"``).
+        value: El valor numérico a formatear.
 
     Returns:
-        Formatted string with ``$`` or ``%`` prefix as appropriate.
+        Cadena formateada con ``B/.`` o ``%`` según corresponda.
     """
     if metric == "margin":
         return fmt_percent(value)
     return fmt_currency(value)
 
 
-# ── Section Renderers ────────────────────────────────────────────────────────
+# ── Renderizadores de Secciones ──────────────────────────────────────────────
 
 def _render_variable_config(
     base_inputs: dict[str, Any],
 ) -> tuple[list[VariableRange], int]:
-    """Render the variable-range configuration panel.
+    """Renderiza el panel de configuración de rangos de variables.
 
-    Lets users toggle variables on/off and adjust low / high bounds
-    via sliders.
+    Permite a los usuarios activar/desactivar variables y ajustar
+    los límites bajo / alto mediante controles numéricos.
 
     Args:
-        base_inputs: Current scenario inputs for computing defaults.
+        base_inputs: Entradas actuales del escenario para calcular
+            valores por defecto.
 
     Returns:
-        A tuple of (list of configured VariableRange, n_iterations).
+        Una tupla de (lista de VariableRange configurados, n_iteraciones).
     """
     defaults = build_default_ranges(base_inputs)
 
-    st.markdown("#### Simulation Settings")
+    st.markdown("#### Configuración de Simulación")
     col_iter, col_spread = st.columns(2)
     n_iterations: int = col_iter.number_input(
-        "Number of iterations",
+        "Número de iteraciones",
         min_value=100,
         max_value=50_000,
         value=5_000,
         step=500,
         key="mc_iterations",
-        help="More iterations = smoother distributions but slower.",
+        help="Más iteraciones = distribuciones más suaves pero más lento.",
     )
     default_spread: float = col_spread.number_input(
-        "Default spread (%)",
+        "Dispersión por defecto (%)",
         min_value=1.0,
         max_value=50.0,
         value=20.0,
         step=5.0,
         key="mc_spread",
-        help="Symmetric +/- percentage applied to all variables.",
+        help="Porcentaje +/- simétrico aplicado a todas las variables.",
     ) / 100.0
 
-    st.markdown("#### Variable Ranges")
+    st.markdown("#### Rangos de Variables")
     st.caption(
-        "Toggle variables on/off and adjust the optimistic (low) and "
-        "pessimistic (high) bounds.  The base value comes from your "
-        "current scenario inputs."
+        "Active/desactive variables y ajuste los límites optimista (bajo) "
+        "y pesimista (alto). El valor base proviene de las entradas "
+        "actuales de su escenario."
     )
 
     configured: list[VariableRange] = []
 
     for vr in defaults:
-        # Recompute low/high based on current spread setting.
+        # Recalcular bajo/alto basado en la dispersión actual.
         low_default = round(vr.base * (1.0 - default_spread), 4)
         high_default = round(vr.base * (1.0 + default_spread), 4)
 
         with st.expander(f"{vr.label}  (base: {vr.base:,.2f})", expanded=False):
             enabled: bool = st.checkbox(
-                "Include in simulation",
+                "Incluir en simulación",
                 value=True,
                 key=f"mc_en_{vr.key}",
             )
             col_lo, col_hi = st.columns(2)
             low_val: float = col_lo.number_input(
-                "Low (optimistic)",
+                "Bajo (optimista)",
                 value=low_default,
                 step=abs(vr.base * 0.05) or 0.01,
                 key=f"mc_lo_{vr.key}",
             )
             high_val: float = col_hi.number_input(
-                "High (pessimistic)",
+                "Alto (pesimista)",
                 value=high_default,
                 step=abs(vr.base * 0.05) or 0.01,
                 key=f"mc_hi_{vr.key}",
@@ -131,21 +132,21 @@ def _render_variable_config(
 
 
 def _render_summary_table(sim: SimulationResults) -> None:
-    """Render the summary statistics table.
+    """Renderiza la tabla de estadísticas resumidas.
 
     Args:
-        sim: Completed simulation results.
+        sim: Resultados de simulación completada.
     """
-    st.markdown("#### Summary Statistics")
+    st.markdown("#### Estadísticas Resumidas")
     st.dataframe(
         sim.summary_df.style.format({
-            "Mean": "${:,.2f}",
-            "Std Dev": "${:,.2f}",
-            "5th Pctl": "${:,.2f}",
-            "25th Pctl": "${:,.2f}",
-            "Median": "${:,.2f}",
-            "75th Pctl": "${:,.2f}",
-            "95th Pctl": "${:,.2f}",
+            "Media": "B/.{:,.2f}",
+            "Desv. Est.": "B/.{:,.2f}",
+            "Percentil 5": "B/.{:,.2f}",
+            "Percentil 25": "B/.{:,.2f}",
+            "Mediana": "B/.{:,.2f}",
+            "Percentil 75": "B/.{:,.2f}",
+            "Percentil 95": "B/.{:,.2f}",
             "P(< 0)": "{:.1f}%",
         }),
         use_container_width=True,
@@ -154,15 +155,15 @@ def _render_summary_table(sim: SimulationResults) -> None:
 
 
 def _render_histogram(sim: SimulationResults) -> None:
-    """Render an interactive histogram for a user-selected metric.
+    """Renderiza un histograma interactivo para una métrica seleccionada.
 
     Args:
-        sim: Completed simulation results.
+        sim: Resultados de simulación completada.
     """
-    st.markdown("#### Distribution")
+    st.markdown("#### Distribución")
 
     selected_metric: str = st.selectbox(
-        "Select metric",
+        "Seleccionar métrica",
         TRACKED_METRICS,
         format_func=lambda m: METRIC_LABELS.get(m, m),
         key="mc_hist_metric",
@@ -175,23 +176,23 @@ def _render_histogram(sim: SimulationResults) -> None:
 
     fig = go.Figure()
 
-    # Histogram
+    # Histograma
     fig.add_trace(go.Histogram(
         x=arr,
         nbinsx=60,
         marker_color="#40916c",
         opacity=0.75,
-        name="Distribution",
+        name="Distribución",
     ))
 
-    # Mean line
+    # Línea de media
     fig.add_vline(
         x=mean_val, line_dash="dash", line_color="#1d3557",
-        annotation_text=f"Mean: {_format_metric_value(selected_metric, mean_val)}",
+        annotation_text=f"Media: {_format_metric_value(selected_metric, mean_val)}",
         annotation_position="top right",
     )
 
-    # 5th / 95th percentile lines
+    # Líneas de percentiles 5 y 95
     fig.add_vline(
         x=p5, line_dash="dot", line_color="#d62828",
         annotation_text=f"P5: {_format_metric_value(selected_metric, p5)}",
@@ -203,14 +204,14 @@ def _render_histogram(sim: SimulationResults) -> None:
         annotation_position="top right",
     )
 
-    # Zero line for profit metrics
+    # Línea de cero para métricas de ganancia
     if selected_metric in ("net_profit", "margin", "profit_per_ha"):
         fig.add_vline(x=0, line_color="red", line_width=2)
 
     fig.update_layout(
-        title=f"{METRIC_LABELS[selected_metric]} — {sim.n_iterations:,} iterations",
+        title=f"{METRIC_LABELS[selected_metric]} — {sim.n_iterations:,} iteraciones",
         xaxis_title=METRIC_LABELS[selected_metric],
-        yaxis_title="Frequency",
+        yaxis_title="Frecuencia",
         showlegend=False,
         height=400,
     )
@@ -218,36 +219,33 @@ def _render_histogram(sim: SimulationResults) -> None:
 
 
 def _render_tornado_chart(sim: SimulationResults) -> None:
-    """Render a tornado (sensitivity) chart.
+    """Renderiza un gráfico de tornado (sensibilidad).
 
-    For each enabled variable, shows the range of net profit between
-    its 10th and 90th percentile contribution, giving a quick visual
-    of which inputs matter most.
+    Muestra el intervalo de confianza del 90 % para la ganancia neta.
 
     Args:
-        sim: Completed simulation results.
+        sim: Resultados de simulación completada.
     """
-    st.markdown("#### Sensitivity (Net Profit Range)")
+    st.markdown("#### Sensibilidad (Rango de Ganancia Neta)")
 
     arr = sim.metric_arrays["net_profit"]
-    median_profit = float(np.median(arr))
     p10 = float(np.percentile(arr, 10))
     p90 = float(np.percentile(arr, 90))
 
-    # Show the 90% confidence interval as a simple tornado bar.
+    # Mostrar el intervalo de confianza del 90 %.
     st.metric(
-        "90% Confidence Interval (Net Profit)",
-        f"{fmt_currency(p10)}  to  {fmt_currency(p90)}",
+        "Intervalo de Confianza 90 % (Ganancia Neta)",
+        f"{fmt_currency(p10)}  a  {fmt_currency(p90)}",
     )
 
 
 def _render_risk_metrics(sim: SimulationResults) -> None:
-    """Render high-level risk KPIs.
+    """Renderiza KPIs de riesgo de alto nivel.
 
     Args:
-        sim: Completed simulation results.
+        sim: Resultados de simulación completada.
     """
-    st.markdown("#### Risk Indicators")
+    st.markdown("#### Indicadores de Riesgo")
 
     profit_arr = sim.metric_arrays["net_profit"]
     prob_loss = float(np.mean(profit_arr < 0) * 100)
@@ -256,33 +254,33 @@ def _render_risk_metrics(sim: SimulationResults) -> None:
     best_case = float(np.percentile(profit_arr, 95))
 
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("P(Loss)", fmt_percent(prob_loss))
-    col2.metric("Expected Profit", fmt_currency(expected_profit))
-    col3.metric("Worst Case (P5)", fmt_currency(worst_case))
-    col4.metric("Best Case (P95)", fmt_currency(best_case))
+    col1.metric("P(Pérdida)", fmt_percent(prob_loss))
+    col2.metric("Ganancia Esperada", fmt_currency(expected_profit))
+    col3.metric("Peor Caso (P5)", fmt_currency(worst_case))
+    col4.metric("Mejor Caso (P95)", fmt_currency(best_case))
 
-    # Colour-coded probability bar
+    # Barra de probabilidad con código de color
     if prob_loss > 50:
         st.error(
-            f"High risk: {prob_loss:.1f}% probability of operating at a loss."
+            f"Riesgo alto: {prob_loss:.1f}% de probabilidad de operar con pérdida."
         )
     elif prob_loss > 20:
         st.warning(
-            f"Moderate risk: {prob_loss:.1f}% probability of operating at a loss."
+            f"Riesgo moderado: {prob_loss:.1f}% de probabilidad de operar con pérdida."
         )
     else:
         st.success(
-            f"Low risk: {prob_loss:.1f}% probability of operating at a loss."
+            f"Riesgo bajo: {prob_loss:.1f}% de probabilidad de operar con pérdida."
         )
 
 
 def _render_cumulative_chart(sim: SimulationResults) -> None:
-    """Render a cumulative distribution function (CDF) for net profit.
+    """Renderiza una función de distribución acumulada (CDF) para ganancia neta.
 
     Args:
-        sim: Completed simulation results.
+        sim: Resultados de simulación completada.
     """
-    st.markdown("#### Cumulative Probability (Net Profit)")
+    st.markdown("#### Probabilidad Acumulada (Ganancia Neta)")
 
     arr = np.sort(sim.metric_arrays["net_profit"])
     cdf = np.arange(1, len(arr) + 1) / len(arr) * 100
@@ -295,51 +293,51 @@ def _render_cumulative_chart(sim: SimulationResults) -> None:
         name="CDF",
     ))
 
-    # Add a zero line and the 50% line
+    # Agregar línea de cero y línea del 50 %
     fig.add_vline(x=0, line_dash="dash", line_color="red", line_width=1)
     fig.add_hline(y=50, line_dash="dot", line_color="grey", line_width=1)
 
     fig.update_layout(
-        xaxis_title="Net Profit ($)",
-        yaxis_title="Cumulative Probability (%)",
+        xaxis_title="Ganancia Neta (B/.)",
+        yaxis_title="Probabilidad Acumulada (%)",
         height=350,
         showlegend=False,
     )
     st.plotly_chart(fig, use_container_width=True)
 
 
-# ── Public API ───────────────────────────────────────────────────────────────
+# ── API Pública ──────────────────────────────────────────────────────────────
 
 def render(base_inputs: dict[str, Any]) -> None:
-    """Render the full Monte Carlo simulation tab.
+    """Renderiza la pestaña completa de simulación Monte Carlo.
 
-    Includes variable configuration, a run button, and all result
-    visualisations.
+    Incluye configuración de variables, botón de ejecución y todas
+    las visualizaciones de resultados.
 
     Args:
-        base_inputs: The current scenario input dictionary from the
-            sidebar.
+        base_inputs: El diccionario de entradas del escenario actual
+            desde el panel lateral.
     """
-    st.subheader("Monte Carlo Simulation")
+    st.subheader("Simulación Monte Carlo")
     st.markdown(
-        "Model uncertainty by sampling key inputs from probability "
-        "distributions and running thousands of scenarios.  This helps "
-        "you understand the **range of possible outcomes** and the "
-        "**probability of profit or loss**."
+        "Modele la incertidumbre muestreando entradas clave desde "
+        "distribuciones de probabilidad y ejecutando miles de escenarios. "
+        "Esto le ayuda a entender el **rango de resultados posibles** y "
+        "la **probabilidad de ganancia o pérdida**."
     )
 
-    # ── Configuration ────────────────────────────────────────────────────
+    # ── Configuración ────────────────────────────────────────────────────
     variable_ranges, n_iterations = _render_variable_config(base_inputs)
 
-    # ── Run button ───────────────────────────────────────────────────────
+    # ── Botón de ejecución ───────────────────────────────────────────────
     run_clicked: bool = st.button(
-        f"Run {n_iterations:,} Simulations",
+        f"Ejecutar {n_iterations:,} Simulaciones",
         type="primary",
         use_container_width=True,
     )
 
     if run_clicked:
-        with st.spinner(f"Running {n_iterations:,} iterations..."):
+        with st.spinner(f"Ejecutando {n_iterations:,} iteraciones..."):
             sim = run_simulation(
                 base_inputs=base_inputs,
                 variable_ranges=variable_ranges,
@@ -347,11 +345,11 @@ def render(base_inputs: dict[str, Any]) -> None:
             )
         st.session_state["mc_results"] = sim
 
-    # ── Results ──────────────────────────────────────────────────────────
+    # ── Resultados ───────────────────────────────────────────────────────
     if "mc_results" not in st.session_state:
         st.info(
-            "Configure the variable ranges above, then click "
-            "**Run Simulations** to see results."
+            "Configure los rangos de variables arriba, luego haga clic en "
+            "**Ejecutar Simulaciones** para ver los resultados."
         )
         return
 
