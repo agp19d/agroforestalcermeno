@@ -7,6 +7,8 @@ rendered by a dedicated private function, keeping the public
 
 from __future__ import annotations
 
+from typing import Any
+
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
@@ -20,6 +22,7 @@ from config import (
 )
 from formatting import fmt_currency, fmt_number, fmt_percent
 from models import FinancialResults, calculate
+from ui import montecarlo
 
 
 # ── Tab Renderers ────────────────────────────────────────────────────────────
@@ -310,15 +313,18 @@ def _render_compare_tab() -> None:
 
 # ── Public API ───────────────────────────────────────────────────────────────
 
-def render(results: FinancialResults) -> None:
+def render(results: FinancialResults, base_inputs: dict[str, Any]) -> None:
     """Render the entire main-area dashboard.
 
-    Displays headline KPIs at the top, followed by five tabs for
-    detailed breakdowns and scenario comparison.
+    Displays headline KPIs at the top, followed by six tabs for
+    detailed breakdowns, scenario comparison, and Monte Carlo
+    simulation.
 
     Args:
         results: The :class:`~models.FinancialResults` for the current
             set of inputs.
+        base_inputs: Raw sidebar input dictionary, passed through to
+            the Monte Carlo tab so it can sample around these values.
     """
     # Headline KPIs
     col1, col2, col3, col4 = st.columns(4)
@@ -330,12 +336,13 @@ def render(results: FinancialResults) -> None:
     st.divider()
 
     # Detailed tabs
-    tab_prod, tab_rev, tab_costs, tab_profit, tab_compare = st.tabs([
+    tab_prod, tab_rev, tab_costs, tab_profit, tab_compare, tab_mc = st.tabs([
         "Production",
         "Revenue",
         "Costs",
         "Profitability",
         "Compare Scenarios",
+        "Monte Carlo",
     ])
 
     with tab_prod:
@@ -348,3 +355,5 @@ def render(results: FinancialResults) -> None:
         _render_profitability_tab(results)
     with tab_compare:
         _render_compare_tab()
+    with tab_mc:
+        montecarlo.render(base_inputs)
