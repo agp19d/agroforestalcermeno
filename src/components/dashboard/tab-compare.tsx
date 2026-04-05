@@ -4,7 +4,7 @@ import { fmtCurrency, fmtPercent, fmtNumber } from '@/lib/formatting';
 import { calculate } from '@/lib/models';
 import { useScenarios } from '@/hooks/use-scenarios';
 
-const BAR_COLORS = ['#2d6a4f', '#d4a017', '#b83030', '#1d3557', '#e07020'];
+const BAR_COLORS = ['#A0D585', '#E8C547', '#E06070', '#6984A9', '#E8A040'];
 
 export function TabCompare() {
   const { scenarios, names } = useScenarios();

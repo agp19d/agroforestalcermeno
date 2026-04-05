@@ -5,8 +5,8 @@ import type { FinancialResults } from '@/lib/models';
 interface Props { results: FinancialResults }
 
 const COST_COLORS = [
-  '#b83030', '#d4a017', '#e07020', '#2d6a4f', '#40916c',
-  '#74c69d', '#1d3557', '#457b9d', '#a8dadc', '#f4a261', '#e76f51',
+  '#E06070', '#E8C547', '#E8A040', '#A0D585', '#6DD4A0',
+  '#B8E8C8', '#6984A9', '#88B4D0', '#EEFABD', '#D4A05A', '#C86050',
 ];
 
 export function TabCosts({ results: r }: Props) {

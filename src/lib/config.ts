@@ -103,15 +103,15 @@ export const PRODUCTS: Product[] = [
 ];
 
 export const COLOURS_PRODUCT: Record<string, string> = {
-  cereza: '#b83030',
-  honey: '#d4a017',
-  natural: '#e07020',
-  pilado: '#2d6a4f',
+  cereza: '#E06070',
+  honey: '#E8C547',
+  natural: '#E8A040',
+  pilado: '#A0D585',
 };
 
-export const COLOUR_POSITIVE = '#2d6a4f';
+export const COLOUR_POSITIVE = '#A0D585';
 export const COLOUR_NEGATIVE = '#d62828';
-export const COLOUR_TOTAL = '#1d3557';
+export const COLOUR_TOTAL = '#6984A9';
 
 export const DEFAULT_VARIABLE_KEYS = [
   { key: 'cherry_yield_per_ha', label: 'Rendimiento de Cereza (lbs/ha)' },

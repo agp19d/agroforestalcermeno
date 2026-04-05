@@ -60,7 +60,7 @@ export function TabProduction({ results: r }: Props) {
                 formatter={(value) => fmtNumber(Number(value))}
               />
               <Legend />
-              <Bar dataKey="entrada" name="Cereza Entrada" fill="rgba(184,48,48,0.4)" />
+              <Bar dataKey="entrada" name="Cereza Entrada" fill="rgba(224,96,112,0.4)" />
               <Bar dataKey="producto" name="Producto Obtenido" fill={COLOURS_PRODUCT.pilado} />
             </BarChart>
           </ResponsiveContainer>

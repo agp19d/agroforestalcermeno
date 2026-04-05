@@ -1,6 +1,21 @@
 import { createContext, useContext, useReducer, type ReactNode } from 'react';
 import { DEFAULT_INPUTS, type InputValues } from '@/lib/config';
 
+// Security: allowlist of valid keys for input validation
+const VALID_KEYS = new Set<string>(Object.keys(DEFAULT_INPUTS));
+
+/** Validate and sanitize InputValues, ensuring all fields are finite numbers. */
+function validateInputs(raw: InputValues): InputValues {
+  const result = { ...DEFAULT_INPUTS };
+  for (const key of VALID_KEYS) {
+    const val = (raw as unknown as Record<string, unknown>)[key];
+    if (typeof val === 'number' && Number.isFinite(val)) {
+      (result as Record<string, number>)[key] = val;
+    }
+  }
+  return result;
+}
+
 type Action =
   | { type: 'SET_FIELD'; key: keyof InputValues; value: number }
   | { type: 'LOAD_SCENARIO'; inputs: InputValues }
@@ -8,10 +23,16 @@ type Action =
 
 function reducer(state: InputValues, action: Action): InputValues {
   switch (action.type) {
-    case 'SET_FIELD':
-      return { ...state, [action.key]: action.value };
+    case 'SET_FIELD': {
+      // Security: reject non-finite values to prevent NaN propagation
+      const val = action.value;
+      if (typeof val !== 'number' || !Number.isFinite(val)) return state;
+      return { ...state, [action.key]: val };
+    }
     case 'LOAD_SCENARIO':
-      return { ...action.inputs };
+      // Security: sanitize loaded scenario data to prevent prototype pollution
+      // and NaN propagation from tampered localStorage
+      return validateInputs(action.inputs);
     case 'RESET_DEFAULTS':
       return { ...DEFAULT_INPUTS };
     default:

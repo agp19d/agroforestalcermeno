@@ -111,7 +111,11 @@ export function TabMonteCarlo() {
             min={100}
             max={50000}
             step={500}
-            onChange={(e) => setNIterations(parseInt(e.target.value) || 5000)}
+            onChange={(e) => {
+              // Security: clamp to safe range to prevent DoS
+              const v = parseInt(e.target.value) || 5000;
+              setNIterations(Math.max(100, Math.min(50000, v)));
+            }}
           />
         </div>
         <div className="space-y-1">
@@ -259,7 +263,7 @@ export function TabMonteCarlo() {
                     formatter={(value) => [Number(value), 'Frecuencia']}
                     labelFormatter={(v) => formatMetricValue(selectedMetric, v as number)}
                   />
-                  <Bar dataKey="count" fill="#40916c" opacity={0.75} />
+                  <Bar dataKey="count" fill="#A0D585" opacity={0.75} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -277,7 +281,7 @@ export function TabMonteCarlo() {
                   />
                   <ReferenceLine x={0} stroke="#d62828" strokeDasharray="5 5" />
                   <ReferenceLine y={50} stroke="grey" strokeDasharray="3 3" />
-                  <Line type="monotone" dataKey="y" stroke="#2d6a4f" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="y" stroke="#A0D585" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>

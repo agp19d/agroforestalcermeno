@@ -3,11 +3,11 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --espresso: #1a0e0a;
-  --dark-roast: #2c1810;
-  --medium-roast: #4a2c1a;
-  --parchment: #f5edd6;
-  --gold: #c9a84c;
+  --espresso: #1a2744;
+  --dark-roast: #263B6A;
+  --medium-roast: #3d5a8a;
+  --parchment: #EEFABD;
+  --gold: #A0D585;
   --cherry-red: #b83030;
 
   --background: var(--espresso);
@@ -20,20 +20,20 @@
   --primary-foreground: var(--espresso);
   --secondary: var(--medium-roast);
   --secondary-foreground: var(--parchment);
-  --muted: #3a2218;
-  --muted-foreground: rgba(245, 237, 214, 0.5);
+  --muted: #2e4570;
+  --muted-foreground: rgba(238, 250, 189, 0.5);
   --accent: var(--medium-roast);
   --accent-foreground: var(--gold);
   --destructive: #d62828;
   --destructive-foreground: var(--parchment);
-  --border: rgba(201, 168, 76, 0.15);
-  --input: rgba(201, 168, 76, 0.15);
-  --ring: rgba(201, 168, 76, 0.3);
+  --border: rgba(160, 213, 133, 0.15);
+  --input: rgba(160, 213, 133, 0.15);
+  --ring: rgba(160, 213, 133, 0.3);
   --radius: 0.75rem;
 
-  --colour-positive: #2d6a4f;
+  --colour-positive: #A0D585;
   --colour-negative: #d62828;
-  --colour-total: #1d3557;
+  --colour-total: #6984A9;
 }
 
 * {
@@ -43,7 +43,7 @@
 
 body {
   margin: 0;
-  background: linear-gradient(170deg, #0d0805 0%, var(--espresso) 40%, var(--dark-roast) 100%);
+  background: linear-gradient(170deg, #0f1a30 0%, var(--espresso) 40%, var(--dark-roast) 100%);
   color: var(--foreground);
   font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
   min-height: 100vh;
@@ -57,7 +57,7 @@ body {
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(201, 168, 76, 0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(160, 213, 133, 0.2); border-radius: 3px; }
 
 .recharts-tooltip-wrapper .recharts-default-tooltip {
   background: var(--dark-roast) !important;

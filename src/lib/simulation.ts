@@ -78,11 +78,17 @@ export interface SimulationResults {
   summaryRows: SummaryRow[];
 }
 
+// Security: enforce iteration limits to prevent browser tab DoS
+const MAX_ITERATIONS = 50_000;
+const MIN_ITERATIONS = 100;
+
 export function runSimulation(
   baseInputs: InputValues,
   variableRanges: VariableRange[],
   nIterations = 5000,
 ): SimulationResults {
+  // Clamp iterations to safe range to prevent DoS via excessive computation
+  nIterations = Math.max(MIN_ITERATIONS, Math.min(MAX_ITERATIONS, Math.floor(nIterations) || 5000));
   const arrays: Record<string, number[]> = {};
   for (const m of TRACKED_METRICS) {
     arrays[m] = new Array(nIterations);
